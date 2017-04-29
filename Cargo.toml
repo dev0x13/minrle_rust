@@ -1,0 +1,6 @@
+[package]
+name = "minirle"
+version = "0.1.0"
+authors = ["dev0x13 <george.manuilov@gmail.com>"]
+
+[dependencies]
