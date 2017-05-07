@@ -1,5 +1,4 @@
-#![crate_type = "lib"]
-#![crate_name = "minirle_rust_lib"]
+#![crate_type = "staticlib"]
 
 use std::ptr;
 use std::mem;
@@ -15,7 +14,8 @@ unsafe fn memset<T>(s: *mut T, c: u8, n: u8)
   }
 }
 
-unsafe fn rle_encode(src: *mut u8, dst: *mut u8, src_len: usize, dst_len: usize, bytes_written: *mut usize) -> i32
+#[no_mangle]
+pub unsafe extern "C" fn rle_encode(src: *mut u8, src_len: usize, dst: *mut u8, dst_len: usize, bytes_written: *mut usize) -> i32
 {
   let mut src_end = src.offset(src_len as isize);
   let mut dst_end = dst.offset(dst_len as isize);
@@ -38,26 +38,27 @@ unsafe fn rle_encode(src: *mut u8, dst: *mut u8, src_len: usize, dst_len: usize,
       run += 1;
     }
 
-    ptr::write_bytes(d, run, mem::size_of::<u8>());
+    *d = run;
     d = d.offset(1);
-    ptr::write_bytes(d, run, mem::size_of::<*const u8>());
+    *d = val;
     d = d.offset(1);
   }
   *bytes_written = d as usize - dst as usize;
   0
 }
 
-unsafe fn rle_decode(src: *mut u8, dst: *mut u8, src_len: usize, dst_len: usize, bytes_written: *mut usize) -> i32
+#[no_mangle]
+pub unsafe extern "C" fn rle_decode(src: *mut u8, src_len: usize, dst: *mut u8, dst_len: usize, bytes_written: *mut usize) -> i32
 {
-  let mut src_end = unsafe { src.offset(src_len as isize) };
-  let mut dst_end = unsafe { dst.offset(dst_len as isize) };
-  let mut d = dst;
-  let mut s = src;
-
   if (src_len & 1) != 0
   {
     return -1;
   }
+
+  let mut src_end = src.offset(src_len as isize);
+  let mut dst_end = dst.offset(dst_len as isize);
+  let mut d = dst;
+  let mut s = src;
 
   while s < src_end
   {
@@ -69,8 +70,9 @@ unsafe fn rle_decode(src: *mut u8, dst: *mut u8, src_len: usize, dst_len: usize,
       return -1;
     }
 
-    d = d.offset(run as isize);
     memset(d, val, run);
+    d = d.offset(run as isize);
+    s = s.offset(2);
   }
   *bytes_written = d as usize - dst as usize;
   0

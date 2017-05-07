@@ -4,9 +4,6 @@ version = "0.1.0"
 authors = ["Georgiy Manuilov <george.manuilov@gmail.com>"]
 
 [lib]
-name = "minirle_rust_lib"
+name = "minirle_rust"
+crate-type = ["staticlib"]
 path = "src/lib.rs"
-
-[[bin]]
-name = "minirle_rust_bin"
-path = "src/bin.rs"
