@@ -1,6 +1,12 @@
 [package]
-name = "minirle"
+name = "minirle_rust"
 version = "0.1.0"
-authors = ["dev0x13 <george.manuilov@gmail.com>"]
+authors = ["Georgiy Manuilov <george.manuilov@gmail.com>"]
 
-[dependencies]
+[lib]
+name = "minirle_rust_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "minirle_rust_bin"
+path = "src/bin.rs"
